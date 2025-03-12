@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: currency-exchange
+  datasource:
+    url: jdbc:h2:mem:currency-exchange
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    root: INFO
+
+fixer-currency-exchange:
+  baseUrl: http://data.fixer.io/api
+  accessKey: 368fa2df111a7fb6dfc029cd343d77d0
+  symbolUrl: /symbols
+  ratesUrl: /latest
+  mock:
+    enabled: false
+
+
+#Cache Properties
+currency:
+  exchange:
+    cache:
+      specs:
+        fixerExchanges:
+          cacheName: fixerExchanges
+          cacheTtl: PT10M
+          cacheSize: 100
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
