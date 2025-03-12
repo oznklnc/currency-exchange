@@ -1,4 +1,6 @@
 package com.ozan.currency.exchange.generator;
 
-public interface IdGenartor {
+public interface IdGenerator {
+
+    String generateId();
 }

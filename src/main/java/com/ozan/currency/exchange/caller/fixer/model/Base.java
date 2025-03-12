@@ -1,4 +1,4 @@
-package com.ozan.currency.exchange.caller.currency.exchange.fixer.model;
+package com.ozan.currency.exchange.caller.fixer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
+import java.util.Map;
 
 
 @Getter
@@ -17,4 +18,5 @@ import java.io.Serializable;
 public class Base implements Serializable {
 
     private Boolean success;
+    private Map<String, Object> error;
 }

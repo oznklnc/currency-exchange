@@ -1,4 +1,7 @@
 package com.ozan.currency.exchange.configuration;
 
-public class CurrecyExchangeConfiguration {
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class CurrencyExchangeConfiguration {
 }

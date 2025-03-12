@@ -1,4 +1,11 @@
 package com.ozan.currency.exchange.model;
 
-public class Base {
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.io.Serializable;
+
+@SuperBuilder
+@NoArgsConstructor
+public class Base implements Serializable {
 }

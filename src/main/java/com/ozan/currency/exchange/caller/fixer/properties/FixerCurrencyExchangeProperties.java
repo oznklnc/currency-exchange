@@ -1,4 +1,4 @@
-package com.ozan.currency.exchange.caller.currency.exchange.fixer.properties;
+package com.ozan.currency.exchange.caller.fixer.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

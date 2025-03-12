@@ -1,4 +1,26 @@
 package com.ozan.currency.exchange.model.response;
 
-public class ExchangeConversionHistoryResponse {
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDateTime;
+
+@Schema(
+        name = "ExchangeConversionHistoryResponse",
+        description = "Schema to hold exchange conversion history response information"
+)
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExchangeConversionHistoryResponse extends ExchangeConversionResponse {
+
+    @Schema(description = "Transaction date of the exchange conversion")
+    private LocalDateTime transactionDate;
+
 }

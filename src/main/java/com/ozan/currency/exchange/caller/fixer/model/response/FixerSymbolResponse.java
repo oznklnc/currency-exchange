@@ -1,6 +1,7 @@
 package com.ozan.currency.exchange.caller.fixer.model.response;
 
 import com.ozan.currency.exchange.caller.fixer.model.Base;
+import com.ozan.currency.exchange.model.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Map;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SymbolResponse extends Base {
+public class FixerSymbolResponse extends Base {
 
-    private Map<String, String> symbols;
+    private Map<Currency, String> symbols;
 }

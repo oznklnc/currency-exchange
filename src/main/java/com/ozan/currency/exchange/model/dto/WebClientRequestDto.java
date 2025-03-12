@@ -1,4 +1,4 @@
-package com.ozan.currency.exchange.model.request;
+package com.ozan.currency.exchange.model.dto;
 
 import lombok.*;
 
@@ -9,11 +9,11 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WebClientRequest<Req, Res> {
+public class WebClientRequestDto<C, R> {
 
     private String url;
-    private Req requestBody;
-    private Class<Res> responseClass;
+    private C requestBody;
+    private Class<R> responseClass;
     private Map<String, Object> queryParams;
 
 }

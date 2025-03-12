@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.Duration;
 
 @Data
-public class CacheSpec {
+public class CacheSpecDto {
 
     private String cacheName;
     private Duration cacheTtl;
