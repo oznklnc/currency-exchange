@@ -15,10 +15,4 @@ public class ApiException extends RuntimeException {
         this.errorCode = errorCode;
         this.httpStatus = errorCode.getHttpStatus();
     }
-
-    public ApiException(ErrorCode errorCode, HttpStatus httpStatus) {
-        super(errorCode.getMessageCode());
-        this.errorCode = errorCode;
-        this.httpStatus = httpStatus;
-    }
 }

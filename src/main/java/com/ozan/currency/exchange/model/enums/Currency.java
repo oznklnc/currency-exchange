@@ -3,8 +3,6 @@ package com.ozan.currency.exchange.model.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
-
 @Getter
 @AllArgsConstructor
 public enum Currency {
@@ -183,13 +181,5 @@ public enum Currency {
 
     private final String code;
     private final String definition;
-
-    public static Currency getCurrencyByCode(String code) {
-        return Arrays.stream(Currency.values())
-                .filter(currency -> currency.getCode().equals(code))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Currency not found"));
-    }
-
 
 }

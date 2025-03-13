@@ -10,14 +10,16 @@ spring:
     console:
       enabled: true
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    #database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
 
 logging:
   level:
     root: INFO
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
 
 fixer-currency-exchange:
   baseUrl: http://data.fixer.io/api
@@ -44,3 +46,26 @@ management:
     web:
       exposure:
         include: "*"
+
+
+
+resilience4j.retry:
+  instances:
+    currencyExchangeRetry:
+      max-attempts: 3
+      wait-duration: 500ms
+      retry-exceptions:
+        - java.io.IOException
+        - org.springframework.web.client.HttpServerErrorException
+        - com.ozan.currency.exchange.exception.ClientException
+      ignore-exceptions:
+        - org.springframework.web.client.HttpClientErrorException
+
+
+resilience4j.ratelimiter:
+    instances:
+      currencyExchangeRateLimiter:
+        limit-for-period: 10
+        limit-refresh-period: 1m
+        timeout-duration: 500ms
+

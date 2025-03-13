@@ -2,8 +2,11 @@ package com.ozan.currency.exchange.client.template.impl;
 
 import com.ozan.currency.exchange.base.UnitTest;
 import com.ozan.currency.exchange.caller.fixer.model.response.FixerRateResponse;
+import com.ozan.currency.exchange.exception.ApiException;
+import com.ozan.currency.exchange.exception.ClientException;
 import com.ozan.currency.exchange.model.dto.WebClientRequestDto;
 import com.ozan.currency.exchange.model.enums.Currency;
+import com.ozan.currency.exchange.model.enums.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
@@ -17,6 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -72,5 +76,22 @@ class WebClientTemplateImplTest extends UnitTest {
         inOrder.verify(responseSpec).bodyToMono(FixerRateResponse.class);
     }
 
+
+    @Test
+    void shouldReturnFallbackExceptionWhenAnyExceptionOccurredFromWebClient() {
+        //Given
+        String url = "https://api.example.com/data";
+        WebClientRequestDto<Void, FixerRateResponse> requestDto = WebClientRequestDto.<Void, FixerRateResponse>builder()
+                .url(url)
+                .responseClass(FixerRateResponse.class)
+                .queryParams(Map.of("access_key", "accessKey"))
+                .build();
+        ClientException clientException = new ClientException("testException", ErrorCode.RETRY_GENERIC_ERROR);
+
+        //When & Then
+        assertThatThrownBy(() -> webClientTemplate.fallbackResponse(requestDto, clientException))
+                .isInstanceOf(ApiException.class)
+                .hasMessage(ErrorCode.RETRY_GENERIC_ERROR.getMessageCode());
+    }
 
 }

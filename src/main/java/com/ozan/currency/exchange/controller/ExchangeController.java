@@ -9,6 +9,7 @@ import com.ozan.currency.exchange.model.response.*;
 import com.ozan.currency.exchange.service.ExchangeConversionHistoryService;
 import com.ozan.currency.exchange.service.ExchangeConversionService;
 import com.ozan.currency.exchange.service.ExchangeRateService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 )
 @RestController
 @Validated
+@Slf4j
 @RequestMapping(UrlPath.BASE_PATH)
 @RequiredArgsConstructor
 public class ExchangeController {
@@ -55,6 +58,7 @@ public class ExchangeController {
                     )
             )
     })
+    @RateLimiter(name = "currencyExchangeRateLimiter")
     @GetMapping("/currencies")
     public ResponseEntity<ExchangeCurrencyListResponse> getAllCurrencies() {
         return ResponseEntity.ok(exchangeRateService.getAllCurrencies());
@@ -88,6 +92,7 @@ public class ExchangeController {
                     )
             )
     })
+    @RateLimiter(name = "currencyExchangeRateLimiter")
     @GetMapping("/exchange-rate")
     public ResponseEntity<ExchangeRateResponse> getExchangeRate(@Valid ExchangeRateRequest request) {
         return ResponseEntity.ok(exchangeRateService.getExchangeRate(request.getFrom(), request.getTo()));
@@ -121,6 +126,7 @@ public class ExchangeController {
                     )
             )
     })
+    @RateLimiter(name = "currencyExchangeRateLimiter")
     @PostMapping("/convert")
     public ResponseEntity<ExchangeConversionResponse> convert(@RequestBody @Valid ConversionRequest request) {
         return ResponseEntity.ok(exchangeConversionService.convert(request));
@@ -154,6 +160,7 @@ public class ExchangeController {
                     )
             )
     })
+    @RateLimiter(name = "currencyExchangeRateLimiter")
     @GetMapping("/conversion-history")
     public ResponseEntity<PagedResponse<ExchangeConversionHistoryResponse>> getExchangeConversionHistory(@Valid ExchangeConversionHistoryFilterRequest request) {
         return ResponseEntity

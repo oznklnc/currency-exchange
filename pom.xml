@@ -32,6 +32,7 @@
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.projectKey>my-project</sonar.projectKey>
+        <resilience4j-spring-boot3.version>2.3.0</resilience4j-spring-boot3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -83,6 +84,11 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>${resilience4j-spring-boot3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -139,7 +145,6 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/handler/*</exclude>
-                                <exclude>**/exception/*</exclude>
                                 <exclude>com/ozan/currency/exchange/configuration/WebClientConfig.class</exclude>
                                 <exclude>com/ozan/currency/exchange/CurrencyExchangeApplication.class</exclude>
                             </excludes>

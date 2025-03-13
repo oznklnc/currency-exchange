@@ -41,6 +41,7 @@ Currencies in the project have been designed to be compatible with the external 
 - Spring Boot Actuator
 - Caffeine Cache
 - Jacoco (Code Coverage)
+- Resilience4j
 
 ---
 ### Postman
