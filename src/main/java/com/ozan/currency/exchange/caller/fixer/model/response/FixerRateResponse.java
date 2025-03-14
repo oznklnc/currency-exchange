@@ -3,10 +3,7 @@ package com.ozan.currency.exchange.caller.fixer.model.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ozan.currency.exchange.caller.fixer.model.Base;
 import com.ozan.currency.exchange.model.enums.Currency;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -18,6 +15,7 @@ import java.util.Map;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class FixerRateResponse extends Base {
 
     private Long timestamp;

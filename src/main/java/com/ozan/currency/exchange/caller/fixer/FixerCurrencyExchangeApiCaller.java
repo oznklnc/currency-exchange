@@ -18,7 +18,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -31,6 +33,7 @@ public class FixerCurrencyExchangeApiCaller implements CurrencyExchangeApiCaller
     private final ObjectMapper objectMapper;
 
     @Override
+    @Cacheable(value = CacheConstants.FIXER_CACHE_NAME, key = "'symbols'")
     public FixerSymbolResponse getExchangeSymbols() {
         WebClientRequestDto<Void, FixerSymbolResponse> webClientRequestDto = buildSymbolRequest();
         FixerSymbolResponse fixerSymbolResponse = webClientTemplate.get(webClientRequestDto);
@@ -43,12 +46,28 @@ public class FixerCurrencyExchangeApiCaller implements CurrencyExchangeApiCaller
     @Override
     @Cacheable(value = CacheConstants.FIXER_CACHE_NAME, key = "#base.getCode() + '-' + #target.getCode()")
     public FixerRateResponse getExchangeRates(Currency base, Currency target) {
-        WebClientRequestDto<Void, FixerRateResponse> webClientRequestDto = buildRateRequest(base, target);
+        WebClientRequestDto<Void, FixerRateResponse> webClientRequestDto = buildRateRequest(base.getCode(), target.getCode());
         FixerRateResponse fixerRateResponse = webClientTemplate.get(webClientRequestDto);
         if (!fixerRateResponse.getSuccess()) {
             throw new ClientException(buildErrorMessage(fixerRateResponse.getError()), ErrorCode.FIXER_GENERIC_ERROR);
         }
         return fixerRateResponse;
+    }
+
+    @Override
+    public FixerRateResponse getExchangeRatesWithTargets(Currency base, List<Currency> targets) {
+        WebClientRequestDto<Void, FixerRateResponse> webClientRequestDto = buildRateRequest(base.getCode(), buildTargetCodes(targets));
+        FixerRateResponse fixerRateResponse = webClientTemplate.get(webClientRequestDto);
+        if (!fixerRateResponse.getSuccess()) {
+            throw new ClientException(buildErrorMessage(fixerRateResponse.getError()), ErrorCode.FIXER_GENERIC_ERROR);
+        }
+        return fixerRateResponse;
+    }
+
+    private String buildTargetCodes(List<Currency> targets) {
+        return targets.stream()
+                .map(Currency::getCode)
+                .collect(Collectors.joining(","));
     }
 
     private WebClientRequestDto<Void, FixerSymbolResponse> buildSymbolRequest() {
@@ -61,15 +80,15 @@ public class FixerCurrencyExchangeApiCaller implements CurrencyExchangeApiCaller
                 .build();
     }
 
-    private WebClientRequestDto<Void, FixerRateResponse> buildRateRequest(Currency base, Currency target) {
+    private WebClientRequestDto<Void, FixerRateResponse> buildRateRequest(String base, String target) {
 
         return WebClientRequestDto.<Void, FixerRateResponse>builder()
                 .url(fixerCurrencyExchangeProperties.getBaseUrl() + fixerCurrencyExchangeProperties.getRatesUrl())
                 .queryParams(
                         Map.of(
                                 "access_key", fixerCurrencyExchangeProperties.getAccessKey(),
-                                "base", base.getCode(),
-                                "symbols", target.getCode()
+                                "base", base,
+                                "symbols", target
                         )
                 )
                 .responseClass(FixerRateResponse.class)

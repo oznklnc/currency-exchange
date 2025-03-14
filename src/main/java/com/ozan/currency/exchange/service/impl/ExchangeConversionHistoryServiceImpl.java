@@ -5,6 +5,7 @@ import com.ozan.currency.exchange.mapper.ExchangeConversionHistoryResponseMapper
 import com.ozan.currency.exchange.mapper.ResponseMapper;
 import com.ozan.currency.exchange.model.request.ExchangeConversionHistoryFilterRequest;
 import com.ozan.currency.exchange.model.response.ExchangeConversionHistoryResponse;
+import com.ozan.currency.exchange.model.response.ExchangeConversionResponse;
 import com.ozan.currency.exchange.model.response.PagedResponse;
 import com.ozan.currency.exchange.repository.ConversionHistoryRepository;
 import com.ozan.currency.exchange.service.ExchangeConversionHistoryService;
@@ -34,5 +35,17 @@ public class ExchangeConversionHistoryServiceImpl implements ExchangeConversionH
         );
         return responseMapper
                 .toPagedResponse(conversionHistoryPage, exchangeConversionHistoryResponseMapper);
+    }
+
+    @Override
+    public void creteExchangeConversionHistory(ExchangeConversionResponse exchangeConversionResponse) {
+        ConversionHistory conversionHistory = ConversionHistory.builder()
+                .transactionId(exchangeConversionResponse.getTransactionId())
+                .sourceCurrency(exchangeConversionResponse.getFrom())
+                .targetCurrency(exchangeConversionResponse.getTo())
+                .amount(exchangeConversionResponse.getAmount())
+                .convertedAmount(exchangeConversionResponse.getConvertedAmount())
+                .build();
+        conversionHistoryRepository.save(conversionHistory);
     }
 }

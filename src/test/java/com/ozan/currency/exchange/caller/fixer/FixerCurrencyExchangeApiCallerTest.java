@@ -16,7 +16,9 @@ import org.mockito.*;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -150,6 +152,61 @@ class FixerCurrencyExchangeApiCallerTest extends UnitTest {
 
         //when & then
         assertThatThrownBy(() -> apiCaller.getExchangeRates(Currency.EUR, Currency.USD))
+                .isInstanceOf(ClientException.class)
+                .hasMessage("");
+        InOrder inOrder = inOrder(webClientTemplate, objectMapper);
+        inOrder.verify(webClientTemplate).get(rateRequestCaptor.capture());
+        inOrder.verify(objectMapper).writeValueAsString(any(Map.class));
+    }
+
+    @Test
+    void shouldReturnFixerRateResponseWithTargets() throws Exception {
+        //given
+        List<Currency> targets = List.of(Currency.USD, Currency.TRY);
+        FixerRateResponse response = FixerRateResponse.builder()
+                .success(true)
+                .base(Currency.EUR)
+                .rates(Map.of(Currency.USD, new BigDecimal("0.1"), Currency.TRY, new BigDecimal("0.2")))
+                .build();
+
+        when(properties.getRatesUrl()).thenReturn(RATES_URL);
+        when(webClientTemplate.get(any())).thenReturn(response);
+
+        //when
+        FixerRateResponse result = apiCaller.getExchangeRatesWithTargets(Currency.EUR, targets);
+
+        //then
+        assertThat(result).isEqualTo(response);
+        InOrder inOrder = inOrder(webClientTemplate, objectMapper);
+        inOrder.verify(webClientTemplate).get(rateRequestCaptor.capture());
+        inOrder.verify(objectMapper, never()).writeValueAsString(any(FixerRateResponse.class));
+
+        WebClientRequestDto<Void, FixerRateResponse> capturedRequest = rateRequestCaptor.getValue();
+        assertThat(capturedRequest.getUrl()).isEqualTo(BASE_URL + RATES_URL);
+        assertThat(capturedRequest.getQueryParams()).containsAnyOf(
+                Map.entry("access_key", ACCESS_KEY),
+                Map.entry("base", Currency.USD.getCode()),
+                Map.entry("symbols", targets.stream().map(Currency::getCode).collect(Collectors.joining(",")))
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFixerRateResponseWithTargetsIsNotSuccess() throws Exception {
+        //given
+        Map<String, Object> error = new LinkedHashMap<>();
+        error.put("code", 101);
+        error.put("info", "Invalid access key");
+        FixerRateResponse response = FixerRateResponse.builder()
+                .success(false)
+                .error(error)
+                .build();
+
+        when(properties.getRatesUrl()).thenReturn(RATES_URL);
+        when(webClientTemplate.get(any())).thenReturn(response);
+        when(objectMapper.writeValueAsString(any(Map.class))).thenThrow(JsonProcessingException.class);
+
+        //when & then
+        assertThatThrownBy(() -> apiCaller.getExchangeRatesWithTargets(Currency.EUR, List.of(Currency.USD)))
                 .isInstanceOf(ClientException.class)
                 .hasMessage("");
         InOrder inOrder = inOrder(webClientTemplate, objectMapper);

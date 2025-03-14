@@ -14,19 +14,34 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        order_updates: true
 
 logging:
   level:
     root: INFO
 
 fixer-currency-exchange:
-  baseUrl: http://data.fixer.io/api
+  baseUrl: http://8082/api
   accessKey: 368fa2df111a7fb6dfc029cd343d77d0
   symbolUrl: /symbols
   ratesUrl: /latest
   mock:
     enabled: true
 
+#Job Config
+job:
+  config:
+    fixed-rate: 30000
+    enabled: false
+    updaterName: JobUpdater
+    validityPeriod: 50
+    fetchLimit: 20
+    pageNumber: 0
 
 #Cache Properties
 currency:
@@ -44,3 +59,23 @@ management:
     web:
       exposure:
         include: "*"
+
+resilience4j.retry:
+  instances:
+    currencyExchangeRetry:
+      max-attempts: 3
+      wait-duration: 500ms
+      retry-exceptions:
+        - java.io.IOException
+        - org.springframework.web.client.HttpServerErrorException
+        - com.ozan.currency.exchange.exception.ClientException
+      ignore-exceptions:
+        - org.springframework.web.client.HttpClientErrorException
+
+
+resilience4j.ratelimiter:
+  instances:
+    currencyExchangeRateLimiter:
+      limit-for-period: 10
+      limit-refresh-period: 1m
+      timeout-duration: 500ms

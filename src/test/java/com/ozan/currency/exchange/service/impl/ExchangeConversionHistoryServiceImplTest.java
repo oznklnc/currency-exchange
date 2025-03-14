@@ -7,12 +7,11 @@ import com.ozan.currency.exchange.mapper.ResponseMapper;
 import com.ozan.currency.exchange.model.enums.Currency;
 import com.ozan.currency.exchange.model.request.ExchangeConversionHistoryFilterRequest;
 import com.ozan.currency.exchange.model.response.ExchangeConversionHistoryResponse;
+import com.ozan.currency.exchange.model.response.ExchangeConversionResponse;
 import com.ozan.currency.exchange.model.response.PagedResponse;
 import com.ozan.currency.exchange.repository.ConversionHistoryRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +37,8 @@ class ExchangeConversionHistoryServiceImplTest extends UnitTest {
     @InjectMocks
     private ExchangeConversionHistoryServiceImpl exchangeConversionHistoryService;
 
+    @Captor
+    private ArgumentCaptor<ConversionHistory> conversionHistoryCaptor;
     @Test
     void shouldReturnExchangeConversionHistory() {
         //Given
@@ -78,5 +79,30 @@ class ExchangeConversionHistoryServiceImplTest extends UnitTest {
                 PageRequest.of(request.getPageNumber(), request.getPageSize(), Sort.by(Sort.Order.asc("createdAt")))
         );
         inOrder.verify(responseMapper).toPagedResponse(conversionHistoryPage, exchangeConversionHistoryResponseMapper);
+    }
+
+    @Test
+    void shouldCreateExchangeConversionHistory() {
+        //Given
+        ExchangeConversionResponse exchangeConversionResponse = ExchangeConversionResponse.builder()
+                .transactionId("123")
+                .from(Currency.USD)
+                .to(Currency.TRY)
+                .amount(BigDecimal.TEN)
+                .convertedAmount(BigDecimal.TEN)
+                .build();
+
+        //When
+        exchangeConversionHistoryService.creteExchangeConversionHistory(exchangeConversionResponse);
+
+        //Then
+        InOrder inOrder = inOrder(conversionHistoryRepository);
+        inOrder.verify(conversionHistoryRepository).save(conversionHistoryCaptor.capture());
+        ConversionHistory actualConversionHistory = conversionHistoryCaptor.getValue();
+        assertThat(actualConversionHistory.getTransactionId()).isEqualTo(exchangeConversionResponse.getTransactionId());
+        assertThat(actualConversionHistory.getSourceCurrency()).isEqualTo(exchangeConversionResponse.getFrom());
+        assertThat(actualConversionHistory.getTargetCurrency()).isEqualTo(exchangeConversionResponse.getTo());
+        assertThat(actualConversionHistory.getAmount()).isEqualTo(exchangeConversionResponse.getAmount());
+        assertThat(actualConversionHistory.getConvertedAmount()).isEqualTo(exchangeConversionResponse.getConvertedAmount());
     }
 }

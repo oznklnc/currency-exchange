@@ -1,9 +1,11 @@
 package com.ozan.currency.exchange.service;
 
-import com.ozan.currency.exchange.model.request.ConversionRequest;
 import com.ozan.currency.exchange.model.response.ExchangeConversionResponse;
+import com.ozan.currency.exchange.model.response.ExchangeRateResponse;
+
+import java.math.BigDecimal;
 
 public interface ExchangeConversionService {
 
-    ExchangeConversionResponse convert(ConversionRequest request);
+    ExchangeConversionResponse convert(ExchangeRateResponse exchangeRate, BigDecimal amount);
 }

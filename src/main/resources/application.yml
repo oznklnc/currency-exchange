@@ -15,6 +15,11 @@ spring:
       ddl-auto: update
     show-sql: true
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        order_updates: true
 
 logging:
   level:
@@ -29,6 +34,15 @@ fixer-currency-exchange:
   mock:
     enabled: false
 
+#Job Config
+job:
+  config:
+    fixed-rate: 600000
+    enabled: true
+    updaterName: JobUpdater
+    validityPeriod: 50
+    fetchLimit: 20
+    pageNumber: 0
 
 #Cache Properties
 currency:

@@ -27,7 +27,6 @@ public class LoggingAspect {
         Object result = joinPoint.proceed();
         long duration = System.currentTimeMillis() - start;
         log.info("Executed {} in {} ms", joinPoint.getSignature().toShortString(), duration);
-
         return result;
     }
 }

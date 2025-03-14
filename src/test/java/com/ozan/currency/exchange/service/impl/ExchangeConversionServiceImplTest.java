@@ -1,74 +1,53 @@
 package com.ozan.currency.exchange.service.impl;
 
 import com.ozan.currency.exchange.base.UnitTest;
-import com.ozan.currency.exchange.caller.CurrencyExchangeApiCaller;
-import com.ozan.currency.exchange.caller.fixer.model.response.FixerRateResponse;
-import com.ozan.currency.exchange.entity.ConversionHistory;
-import com.ozan.currency.exchange.mapper.ConversionHistoryMapper;
 import com.ozan.currency.exchange.mapper.ExchangeConversionResponseMapper;
-import com.ozan.currency.exchange.model.request.ConversionRequest;
+import com.ozan.currency.exchange.model.enums.Currency;
 import com.ozan.currency.exchange.model.response.ExchangeConversionResponse;
-import com.ozan.currency.exchange.repository.ConversionHistoryRepository;
+import com.ozan.currency.exchange.model.response.ExchangeRateResponse;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ExchangeConversionServiceImplTest extends UnitTest {
 
     @Mock
-    private CurrencyExchangeApiCaller currencyExchangeApiCaller;
-    @Mock
-    private ConversionHistoryRepository conversionHistoryRepository;
-    @Mock
-    private ConversionHistoryMapper conversionHistoryMapper;
-    @Mock
     private ExchangeConversionResponseMapper exchangeConversionResponseMapper;
+
     @InjectMocks
     private ExchangeConversionServiceImpl exchangeConversionService;
 
-    @Captor
-    private ArgumentCaptor<ConversionHistory> conversionHistoryCaptor;
-
     @Test
-    void shouldConvertAndReturnExchangeConversionResponse() {
+    void shouldConvert() {
         //Given
-        ConversionRequest request = ConversionRequest.builder()
-                .from("USD")
-                .to("EUR")
-                .amount(new BigDecimal("120"))
+        ExchangeRateResponse exchangeRate = ExchangeRateResponse.builder()
+                .from(Currency.EUR)
+                .to(Currency.TRY)
+                .rate(new BigDecimal("38.454545"))
+                .build();
+        BigDecimal amount = BigDecimal.ONE;
+
+        ExchangeConversionResponse expectedResponse = ExchangeConversionResponse.builder()
+                .from(Currency.EUR)
+                .to(Currency.TRY)
+                .amount(BigDecimal.TEN)
+                .convertedAmount(new BigDecimal("384.454545"))
                 .build();
 
-        FixerRateResponse fixerRateResponse = FixerRateResponse.builder()
-                .base(request.getFrom())
-                .rates(Map.of(request.getTo(), BigDecimal.ONE))
-                .build();
-        ConversionHistory conversionHistory = ConversionHistory.builder()
-                .sourceCurrency(request.getFrom())
-                .targetCurrency(request.getTo())
-                .build();
-        ExchangeConversionResponse expectedResponse = new ExchangeConversionResponse();
-
-        when(currencyExchangeApiCaller.getExchangeRates(request.getFrom(), request.getTo())).thenReturn(fixerRateResponse);
-        when(conversionHistoryMapper.apply(request, fixerRateResponse)).thenReturn(conversionHistory);
-        when(exchangeConversionResponseMapper.apply(conversionHistory)).thenReturn(expectedResponse);
-        when(conversionHistoryRepository.save(any())).thenReturn(conversionHistory);
+        when(exchangeConversionResponseMapper.apply(exchangeRate, amount))
+                .thenReturn(expectedResponse);
 
         //When
-        ExchangeConversionResponse response = exchangeConversionService.convert(request);
+        ExchangeConversionResponse actualResponse = exchangeConversionService.convert(exchangeRate, amount);
 
         //Then
-        assertThat(response).isEqualTo(expectedResponse);
-        InOrder inOrder = Mockito.inOrder(currencyExchangeApiCaller, conversionHistoryMapper, exchangeConversionResponseMapper, conversionHistoryRepository);
-        inOrder.verify(currencyExchangeApiCaller).getExchangeRates(request.getFrom(), request.getTo());
-        inOrder.verify(conversionHistoryMapper).apply(request, fixerRateResponse);
-        inOrder.verify(conversionHistoryRepository).save(conversionHistoryCaptor.capture());
-        inOrder.verify(exchangeConversionResponseMapper).apply(conversionHistory);
-        assertThat(conversionHistoryCaptor.getValue()).isEqualTo(conversionHistory);
+        assertThat(actualResponse).isNotNull().isEqualTo(expectedResponse);
+        verify(exchangeConversionResponseMapper).apply(exchangeRate, amount);
     }
 }
