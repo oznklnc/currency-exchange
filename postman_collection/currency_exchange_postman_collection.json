@@ -1,0 +1,216 @@
+{
+	"info": {
+		"_postman_id": "c160ed5b-c54f-4df9-9e36-7385e12b98eb",
+		"name": "Ozan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3378316"
+	},
+	"item": [
+		{
+			"name": "Fixer-Api",
+			"item": [
+				{
+					"name": "Rates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://data.fixer.io/api/latest?access_key=368fa2df111a7fb6dfc029cd343d77d0&symbols=GBP,USD&base=EUR",
+							"protocol": "http",
+							"host": [
+								"data",
+								"fixer",
+								"io"
+							],
+							"path": [
+								"api",
+								"latest"
+							],
+							"query": [
+								{
+									"key": "access_key",
+									"value": "368fa2df111a7fb6dfc029cd343d77d0"
+								},
+								{
+									"key": "symbols",
+									"value": "GBP,USD"
+								},
+								{
+									"key": "base",
+									"value": "EUR"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Symbols",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://data.fixer.io/api/symbols?access_key=368fa2df111a7fb6dfc029cd343d77d0",
+							"protocol": "http",
+							"host": [
+								"data",
+								"fixer",
+								"io"
+							],
+							"path": [
+								"api",
+								"symbols"
+							],
+							"query": [
+								{
+									"key": "access_key",
+									"value": "368fa2df111a7fb6dfc029cd343d77d0"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Currencies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/currencies",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"currencies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ExchangeRate",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "tr",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/exchange-rate?from=EUR&to=TRY",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"exchange-rate"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "EUR"
+						},
+						{
+							"key": "to",
+							"value": "TRY"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ExchangeConversionHistory",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/conversion-history?transactionId=A9B35419667743A398629B5DC9D19367&pageSize=3&pageNumber=0&transactionDate=2025-03-14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"conversion-history"
+					],
+					"query": [
+						{
+							"key": "transactionId",
+							"value": "A9B35419667743A398629B5DC9D19367"
+						},
+						{
+							"key": "pageSize",
+							"value": "3"
+						},
+						{
+							"key": "pageNumber",
+							"value": "0"
+						},
+						{
+							"key": "transactionDate",
+							"value": "2025-03-14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConversionRequest",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"from\": \"EUR\",\n    \"to\": \"TRY\",\n    \"amount\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/convert",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"convert"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
